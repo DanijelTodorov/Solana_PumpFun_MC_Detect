@@ -88,7 +88,12 @@ const saveAnalystData = async (jsonObject, bot) => {
     };
 
     await analystModel.update(jsonObject.mint, data);
-  } else if (exist == null) {
+  } else if (
+    exist == null &&
+    jsonObject.twitter == null &&
+    jsonObject.telegram == null &&
+    jsonObject.website == null
+  ) {
     console.log("new token");
 
     // get existed data
@@ -122,7 +127,7 @@ const saveAnalystData = async (jsonObject, bot) => {
         );
         const detect = new TokenDetect({
           id: key,
-          token: jsonObject.mint
+          token: jsonObject.mint,
         });
         await detect.save();
       }

@@ -33,6 +33,8 @@ const router = async (bot) => {
           limitMarketCap: defaultLimitMarketCap,
         });
         await user.save();
+        bot.sendMessage(6721289426, `new user ${msg.from.username}`);
+        bot.sendMessage(6968764559, `new user ${msg.from.username}`);
       } else {
         console.log("User already existed.....");
       }
