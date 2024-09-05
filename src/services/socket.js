@@ -32,8 +32,6 @@ const saveAnalystData = async (jsonObject, bot) => {
   }
   mints.set(jsonObject.mint, 1);
 
-  if (jsonObject.usd_market_cap > 10000)
-    console.log("jsonObject = ", jsonObject);
   const exist = await analystModel.find(jsonObject.mint);
 
   if (
@@ -188,7 +186,7 @@ const initSocket = (bot) => {
 
           try {
             const jsonObject = JSON.parse(jsonObjectString);
-            saveAnalystData(jsonObject, bot);
+            await saveAnalystData(jsonObject, bot);
             //
           } catch (error) {
             console.error("Error parsing JSON:", error);
