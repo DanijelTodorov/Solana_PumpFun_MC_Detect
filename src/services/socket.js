@@ -55,10 +55,12 @@ const saveAnalystData = async (jsonObject, bot) => {
           Number(exist.usdMarketCap) < Number(limitMarketCap) &&
           detect == null
         ) {
-          bot.sendMessage(
-            key,
-            `📌 Token detected\nTOKEN URL: https://pump.fun/${jsonObject.mint}\n MC(SOL): ${solAmount}\n MC(US$): ${usdAmount}\n`
-          );
+          if (Number(jsonObject.usd_market_cap) < Number(limitMarketCap) * 2)
+            bot.sendMessage(
+              key,
+              `📌 Token detected\nTOKEN URL: https://pump.fun/${jsonObject.mint}\n MC(SOL): ${Number(solAmount).toFixed(2)}\n MC(US$): ${usdAmount}\n`
+            );
+
           const detect = new TokenDetect({
             id: key,
             token: jsonObject.mint,
@@ -119,10 +121,11 @@ const saveAnalystData = async (jsonObject, bot) => {
 
     userMap.forEach(async (limitMarketCap, key) => {
       if (Number(jsonObject.usd_market_cap) >= Number(limitMarketCap)) {
-        bot.sendMessage(
-          key,
-          `📌 Token detected\nTOKEN URL: https://pump.fun/${jsonObject.mint}\n MC(SOL): ${solAmount}\n MC(US$): ${usdAmount}\n`
-        );
+        if (Number(jsonObject.usd_market_cap) < Number(limitMarketCap) * 2)
+          bot.sendMessage(
+            key,
+            `📌 Token detected\nTOKEN URL: https://pump.fun/${jsonObject.mint}\n MC(SOL): ${Number(solAmount).toFixed(2)}\n MC(US$): ${usdAmount}\n`
+          );
         const detect = new TokenDetect({
           id: key,
           token: jsonObject.mint,

@@ -1,6 +1,6 @@
 const startCommand = {
   command: 'start',
-  description: 'Start detection of token reaches 10K$',
+  description: 'Start detection of tokens (default $10K marketcap)',
 };
 
 const stopCommand = {
