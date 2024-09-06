@@ -1,8 +1,0 @@
-TELEGRAM_BOT_TOKEN=6756953676:AAEnMm2ITUcHUi8uech6xMYoF2lSUPShTrI
-URL = @PumpTokenDetectorBot
-NAME = Token Alert Bot
-CLUSTER_ENDPOINT=mainnet-beta
-
-# Server
-PORT=3003
-MONGODB_URI=mongodb://127.0.0.1:27017/TokenAlertBot
