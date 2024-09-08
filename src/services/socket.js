@@ -50,6 +50,7 @@ const saveAnalystData = async (jsonObject, bot) => {
           id: key,
           token: jsonObject.mint,
         });
+        console.log(`=====> cabal key = ${key}, limitMC = ${limitMarketCap}`);
         if (
           Number(jsonObject.usd_market_cap) >= Number(limitMarketCap) &&
           Number(exist.usdMarketCap) < Number(limitMarketCap) &&
@@ -189,6 +190,7 @@ const initSocket = (bot) => {
 
           try {
             const jsonObject = JSON.parse(jsonObjectString);
+            console.log('======>cabal');
             await saveAnalystData(jsonObject, bot);
             //
           } catch (error) {
@@ -209,7 +211,8 @@ const initSocket = (bot) => {
     socket.send("40");
     console.log("Disconnected from WebSocket server");
     socket.send("3");
-    process.exit(1);
+    // process.exit(1);
+    initSocket(bot);
   });
 };
 
