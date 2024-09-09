@@ -13,6 +13,11 @@ const setMarketCapCommand = {
   description: 'Set Market Cap for detection',
 };
 
-const commands = [startCommand, stopCommand, setMarketCapCommand];
+const getMarketCapCommand = {
+  command: 'getmc',
+  description: 'get Market Cap for detection',
+};
+
+const commands = [startCommand, stopCommand, setMarketCapCommand, getMarketCapCommand];
 
 module.exports = commands;

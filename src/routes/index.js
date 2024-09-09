@@ -79,6 +79,16 @@ const router = async (bot) => {
       });
     });
   });
+
+  bot.onText(/^\/getmc$/, async (msg) => {
+    if (msg.chat.id == null || msg.chat.id == undefined) return;
+
+    let user = await userModel.findOne({ id: msg.chat.id });
+    const market_cap = user.limitMarketCap;
+
+    bot.sendMessage(msg.chat.id, `Limit Market Cap = ${market_cap}`);
+  });
+
   bot.on("callback_query", (query) => {
     const data = query.data.split(" ");
     switch (data[0]) {
