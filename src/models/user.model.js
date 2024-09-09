@@ -26,7 +26,8 @@ const userSchema = new mongoose.Schema({
     default: false
   },
   limitMarketCap: {
-    type: Number
+    type: Number,
+    default: 10000
   }
 });
 

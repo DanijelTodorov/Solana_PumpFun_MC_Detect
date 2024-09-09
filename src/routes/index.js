@@ -52,7 +52,6 @@ const router = async (bot) => {
     } else {
       console.log(`${msg.chat.id} is not existed in user list`);
     }
-
   });
 
   bot.onText(/^\/setmc$/, async (msg) => {
@@ -84,9 +83,10 @@ const router = async (bot) => {
     if (msg.chat.id == null || msg.chat.id == undefined) return;
 
     let user = await userModel.findOne({ id: msg.chat.id });
-    const market_cap = user.limitMarketCap;
-
-    bot.sendMessage(msg.chat.id, `Limit Market Cap = ${market_cap}`);
+    if (user) {
+      const market_cap = user.limitMarketCap;
+      bot.sendMessage(msg.chat.id, `Limit Market Cap = ${market_cap}`);
+    }
   });
 
   bot.on("callback_query", (query) => {
