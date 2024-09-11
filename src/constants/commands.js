@@ -18,6 +18,11 @@ const getMarketCapCommand = {
   description: 'get Market Cap for detection',
 };
 
-const commands = [startCommand, stopCommand, setMarketCapCommand, getMarketCapCommand];
+const allowUserCommand = {
+  command: 'allowUser',
+  description: 'Allow User',
+};
+
+const commands = [startCommand, stopCommand, setMarketCapCommand, getMarketCapCommand, allowUserCommand];
 
 module.exports = commands;
