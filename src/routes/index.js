@@ -38,7 +38,8 @@ const router = async (bot) => {
         for (let i = 0; i < admin.length; i++) {
           bot.sendMessage(
             admin[i],
-            `New User registered - Name:${msg.from.username} Id:${msg.chat.id}. You can allow user using /allowuser command.`
+            `New User registered - Name:<code>${msg.from.username}</code> Id:<code>${msg.chat.id}</code>. You can allow user using /allowuser command.`,
+            { parse_mode: "HTML" }
           );
         }
         bot.sendMessage(
