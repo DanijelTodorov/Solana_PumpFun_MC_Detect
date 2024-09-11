@@ -43,7 +43,7 @@ const router = async (bot) => {
         }
         bot.sendMessage(
           msg.chat.id,
-          `You are registerd, but you are not allowed. Contact with @nexxuscrypto`
+          `Please wait to be approved to use the bot.`
         );
       } else {
         console.log("User already existed.....");
