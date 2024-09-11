@@ -10,7 +10,7 @@ const admin = [6721289426, 6968764559, 2103646535];
 
 const router = async (bot) => {
   if (userMap.size == 0) {
-    const users = await userModel.find({allowed: true});
+    const users = await userModel.find({ allowed: true });
     for (let i = 0; i < users.length; i++) {
       userMap.set(users[i].id, users[i].limitMarketCap);
       console.log(users[i].id);
@@ -36,9 +36,15 @@ const router = async (bot) => {
         });
         await user.save();
         for (let i = 0; i < admin.length; i++) {
-          bot.sendMessage(admin[i], `New User registered - Name:${msg.from.username} Id:${msg.chat.id}. You can allow user using /allowUser command.`);
+          bot.sendMessage(
+            admin[i],
+            `New User registered - Name:${msg.from.username} Id:${msg.chat.id}. You can allow user using /allowuser command.`
+          );
         }
-        bot.sendMessage(msg.chat.id, `You are registerd, but you are not allowed. Contact with @nexxuscrypto`)
+        bot.sendMessage(
+          msg.chat.id,
+          `You are registerd, but you are not allowed. Contact with @nexxuscrypto`
+        );
       } else {
         console.log("User already existed.....");
       }
@@ -47,7 +53,7 @@ const router = async (bot) => {
     }
   });
 
-  bot.onText(/^\/allowUser$/, async (msg) => {
+  bot.onText(/^\/allowuser$/, async (msg) => {
     if (msg.chat.id == null || msg.chat.id == undefined) return;
 
     if (admin.includes(msg.chat.id)) {
@@ -60,8 +66,8 @@ const router = async (bot) => {
           bot.once("message", async (response) => {
             const id = response.text;
 
-            if (!isNaN(limit)) {
-              let user = await UserModel.findOne({ id });
+            if (!isNaN(id)) {
+              let user = await userModel.findOne({ id });
               if (user) {
                 console.log("user");
                 user.allowed = true;
@@ -69,7 +75,7 @@ const router = async (bot) => {
                 userMap.set(user.id, user.limitMarketCap);
                 bot.sendMessage(msg.chat.id, `Allowed successfully`);
               } else {
-                bot.sendMessage(msg.chat.id, 'No User');
+                bot.sendMessage(msg.chat.id, "No User");
               }
             } else {
               bot.sendMessage(msg.chat.id, `Invalid limit value`);
@@ -95,36 +101,38 @@ const router = async (bot) => {
 
   bot.onText(/^\/setmc$/, async (msg) => {
     if (msg.chat.id == null || msg.chat.id == undefined) return;
+    if (userMap.get(msg.chat.id)) {
+      bot.sendMessage(msg.chat.id, "Set Market Cap").then(() => {
+        bot.once("message", async (response) => {
+          const newMarketCap = response.text;
 
-    bot.sendMessage(msg.chat.id, "Set Market Cap").then(() => {
-      bot.once("message", async (response) => {
-        const newMarketCap = response.text;
-
-        console.log("Set MarketCap");
-        if (!isNaN(newMarketCap)) {
-          console.log("MC:", newMarketCap);
-          setLimitMarketCap(msg.chat.id, newMarketCap);
-          let user = await userModel.findOne({ id: msg.chat.id });
-          if (user) {
-            console.log("user");
-            user.limitMarketCap = newMarketCap;
-            await user.save();
+          console.log("Set MarketCap");
+          if (!isNaN(newMarketCap)) {
+            console.log("MC:", newMarketCap);
+            setLimitMarketCap(msg.chat.id, newMarketCap);
+            let user = await userModel.findOne({ id: msg.chat.id });
+            if (user) {
+              console.log("user");
+              user.limitMarketCap = newMarketCap;
+              await user.save();
+            }
+            bot.sendMessage(msg.chat.id, `Mc changed successfully`);
+          } else {
+            bot.sendMessage(msg.chat.id, `Invalid Market Cap`);
           }
-          bot.sendMessage(msg.chat.id, `Mc changed successfully`);
-        } else {
-          bot.sendMessage(msg.chat.id, `Invalid Market Cap`);
-        }
+        });
       });
-    });
+    }
   });
 
   bot.onText(/^\/getmc$/, async (msg) => {
     if (msg.chat.id == null || msg.chat.id == undefined) return;
-
-    let user = await userModel.findOne({ id: msg.chat.id });
-    if (user) {
-      const market_cap = user.limitMarketCap;
-      bot.sendMessage(msg.chat.id, `Limit Market Cap = ${market_cap}`);
+    if (userMap.get(msg.chat.id)) {
+      let user = await userModel.findOne({ id: msg.chat.id });
+      if (user) {
+        const market_cap = user.limitMarketCap;
+        bot.sendMessage(msg.chat.id, `Limit Market Cap = ${market_cap}`);
+      }
     }
   });
 

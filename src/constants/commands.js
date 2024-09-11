@@ -19,7 +19,7 @@ const getMarketCapCommand = {
 };
 
 const allowUserCommand = {
-  command: 'allowUser',
+  command: 'allowuser',
   description: 'Allow User',
 };
 
