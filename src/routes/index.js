@@ -6,7 +6,7 @@ const {
 
 const userModel = require("@/models/user.model");
 
-const admin = [6721289426, 6968764559, 2103646535];
+const admin = [6721289426, 6968764559, 631967827];
 
 const router = async (bot) => {
   if (userMap.size == 0) {
@@ -16,6 +16,7 @@ const router = async (bot) => {
       console.log(users[i].id);
     }
   }
+
   bot.onText(/^\/start$/, async (msg) => {
     if (msg.chat.id == null || msg.chat.id == undefined) return;
     bot.sendMessage(msg.chat.id, "Bot started");
@@ -84,7 +85,7 @@ const router = async (bot) => {
           });
         });
     } else {
-      bot.sendMessage(msg.chat.id, "You have no right to allow user!");
+      bot.sendMessage(msg.chat.id, "Only admins can use this function");
       return;
     }
   });
@@ -102,7 +103,7 @@ const router = async (bot) => {
 
   bot.onText(/^\/setmc$/, async (msg) => {
     if (msg.chat.id == null || msg.chat.id == undefined) return;
-    if (userMap.get(msg.chat.id)) {
+    if (userMap.get(msg.chat.id) && admin.includes(msg.chat.id)) {
       bot.sendMessage(msg.chat.id, "Set Market Cap").then(() => {
         bot.once("message", async (response) => {
           const newMarketCap = response.text;
@@ -123,17 +124,22 @@ const router = async (bot) => {
           }
         });
       });
+    } else {
+      bot.sendMessage(msg.chat.id, "Only admins can use this function");
+      return;
     }
   });
 
   bot.onText(/^\/getmc$/, async (msg) => {
     if (msg.chat.id == null || msg.chat.id == undefined) return;
-    if (userMap.get(msg.chat.id)) {
+    if (userMap.get(msg.chat.id) && admin.includes(msg.chat.id)) {
       let user = await userModel.findOne({ id: msg.chat.id });
       if (user) {
         const market_cap = user.limitMarketCap;
         bot.sendMessage(msg.chat.id, `Limit Market Cap = ${market_cap}`);
       }
+    } else {
+      bot.sendMessage(msg.chat.id, 'Only admins can use this function.');
     }
   });
 
