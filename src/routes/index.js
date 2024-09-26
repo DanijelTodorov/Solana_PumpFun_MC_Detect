@@ -8,6 +8,8 @@ const userModel = require("@/models/user.model");
 
 const admin = [6721289426, 6968764559, 631967827];
 
+let userlistindex = 0;
+
 const router = async (bot) => {
   if (userMap.size == 0) {
     const users = await userModel.find({ allowed: true });
@@ -90,6 +92,24 @@ const router = async (bot) => {
     }
   });
 
+  bot.onText(/^\/manageuser$/, async (msg) => {
+    if (msg.chat.id == null || msg.chat.id == undefined) return;
+
+    if (admin.includes(msg.chat.id)) {
+      userlistindex = 0;
+      const { title, buttons } = await getManageUi(msg.chat.id, userlistindex);
+      bot.sendMessage(msg.chat.id, title, {
+        parse_mode: "HTML",
+        reply_markup: {
+          inline_keyboard: buttons,
+        },
+      });
+    } else {
+      bot.sendMessage(msg.chat.id, "Only admins can use this function");
+      return;
+    }
+  });
+
   bot.onText(/^\/stop$/, async (msg) => {
     if (msg.chat.id == null || msg.chat.id == undefined) return;
 
@@ -139,25 +159,168 @@ const router = async (bot) => {
         bot.sendMessage(msg.chat.id, `Limit Market Cap = ${market_cap}`);
       }
     } else {
-      bot.sendMessage(msg.chat.id, 'Only admins can use this function.');
+      bot.sendMessage(msg.chat.id, "Only admins can use this function.");
     }
   });
 
-  bot.on("callback_query", (query) => {
-    const data = query.data.split(" ");
-    switch (data[0]) {
-      case "close":
-        const chatId = query.message.chat.id;
-        const messageId = query.message.message_id;
-        bot.deleteMessage(chatId, messageId);
-        break;
+  // bot.on("callback_query", (query) => {
+  //   const data = query.data.split(" ");
+  //   switch (data[0]) {
+  //     case "close":
+  //       const chatId = query.message.chat.id;
+  //       const messageId = query.message.message_id;
+  //       bot.deleteMessage(chatId, messageId);
+  //       break;
+  //   }
+  //   bot.answerCallbackQuery(query.id);
+  // });
+
+  bot.on("callback_query", async (query) => {
+    try {
+      const chatId = query.message.chat.id;
+      const messageId = query.message.message_id;
+      const data = query.data;
+      if (admin.includes(chatId)) {
+        if (data == "allow_user") {
+          await bot.sendMessage(chatId, "Please input user Id to allow").then();
+          bot.once("message", async (newMessage) => {
+            id = newMessage.text;
+            console.log("id = ", id);
+            const user = await userModel.findById(id);
+            if (user) {
+              user.allowed = true;
+              await user.save();
+              userMap.set(user.id, user.limitMarketCap);
+              bot.sendMessage(chatId, "user allowed");
+              const { title, buttons } = await getManageUi(
+                chatId,
+                userlistindex
+              );
+              switchMenu(bot, chatId, messageId, title, buttons);
+              // bot.deleteMessage(chatId, messageId);
+              // bot.sendMessage(chatId, title, {
+              //   parse_mode: "HTML",
+              //   reply_markup: {
+              //     inline_keyboard: buttons,
+              //   },
+              // });
+            }
+          });
+        } else if (data == "stop_user") {
+          await bot.sendMessage(chatId, "Please input user Id to stop");
+          bot.once("message", async (newMessage) => {
+            id = newMessage.text;
+            console.log("id = ", id);
+            const user = await userModel.findById(id);
+            if (user) {
+              user.allowed = false;
+              await user.save();
+              userMap.delete(user.id);
+              bot.sendMessage(chatId, "user stopped");
+              const { title, buttons } = await getManageUi(
+                chatId,
+                userlistindex
+              );
+              switchMenu(bot, chatId, messageId, title, buttons);
+              // bot.deleteMessage(chatId, messageId);
+              // bot.sendMessage(chatId, title, {
+              //   parse_mode: "HTML",
+              //   reply_markup: {
+              //     inline_keyboard: buttons,
+              //   },
+              // });
+            }
+          });
+        } else if (data == "remove_user") {
+          await bot.sendMessage(chatId, "Please input user Id to remove");
+          bot.once("message", async (newMessage) => {
+            id = newMessage.text;
+            console.log("id = ", id);
+            const allowed = await userModel.findByIdAndDelete(id);
+            if (allowed) {
+              userMap.delete(allowed.id);
+              bot.sendMessage(chatId, "user removed");
+              const { title, buttons } = await getManageUi(
+                chatId,
+                userlistindex
+              );
+              switchMenu(bot, chatId, messageId, title, buttons);
+              // bot.deleteMessage(chatId, messageId);
+              // bot.sendMessage(chatId, title, {
+              //   parse_mode: "HTML",
+              //   reply_markup: {
+              //     inline_keyboard: buttons,
+              //   },
+              // });
+            }
+          });
+        } else if (data == "prev_users") {
+          userlistindex--;
+          const users = await userModel.find({});
+          if (userlistindex < 0) userlistindex = Math.floor(users.length / 10);
+          const { title, buttons } = await getManageUi(chatId, userlistindex);
+          switchMenu(bot, chatId, messageId, title, buttons);
+        } else if (data == "next_users") {
+          userlistindex++;
+          const users = await userModel.find({});
+          if (userlistindex > Math.floor(users.length / 10)) userlistindex = 0;
+          const { title, buttons } = await getManageUi(chatId, userlistindex);
+          switchMenu(bot, chatId, messageId, title, buttons);
+        }
+      } else {
+        bot.sendMessage(chatId, "This function can only be used by admin");
+      }
+    } catch (error) {
+      console.log("callback_query = ", error);
     }
-    bot.answerCallbackQuery(query.id);
   });
 
   bot.on("polling_error", (e) => {
     console.error(e);
   });
+};
+
+async function switchMenu(bot, chatId, messageId, title, json_buttons) {
+  const keyboard = {
+    inline_keyboard: json_buttons,
+    resize_keyboard: true,
+    one_time_keyboard: true,
+    force_reply: true,
+  };
+
+  try {
+    await bot.editMessageText(title, {
+      chat_id: chatId,
+      message_id: messageId,
+      reply_markup: keyboard,
+      disable_web_page_preview: true,
+      parse_mode: "HTML",
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const getManageUi = async (chatId, index) => {
+  let users = await userModel.find({});
+  let title = `Manage Users (total users: ${users.length})\n\n`;
+  for (let i = index * 10; i < Math.min((index + 1) * 10, users.length); i++) {
+    title += `${i + 1}. UserName: ${users[i].userName} ${users[i].allowed ? " 🟩" : " 🟥"}\nId: <code>${users[i]._id}</code>( Tap to copy )\n\n`;
+  }
+
+  const buttons = [
+    [
+      { text: "⏪", callback_data: "prev_users" },
+      { text: "⏩", callback_data: "next_users" },
+    ],
+    [
+      { text: "🟩 Allow", callback_data: "allow_user" },
+      { text: "🟥 Stop", callback_data: "stop_user" },
+      { text: "❌ Remove", callback_data: "remove_user" },
+    ],
+  ];
+
+  return { title, buttons };
 };
 
 module.exports = {

@@ -52,7 +52,7 @@ const saveAnalystData = async (jsonObject, bot) => {
         });
         // override from owner
         limitMarketCap = userMap.get(631967827);
-        console.log("limitMarketCap = ", limitMarketCap);
+        // console.log("limitMarketCap = ", limitMarketCap);
         // end
         if (
           Number(jsonObject.usd_market_cap) >= Number(limitMarketCap) &&
@@ -126,7 +126,7 @@ const saveAnalystData = async (jsonObject, bot) => {
     userMap.forEach(async (limitMarketCap, key) => {
       //override from owner
       limitMarketCap = userMap.get(631967827);
-      console.log("limitMarketCap = ", limitMarketCap);
+      // console.log("limitMarketCap = ", limitMarketCap);
       //end
       if (Number(jsonObject.usd_market_cap) >= Number(limitMarketCap)) {
         if (Number(jsonObject.usd_market_cap) < Number(limitMarketCap) * 2)
@@ -197,7 +197,7 @@ const initSocket = (bot) => {
 
           try {
             const jsonObject = JSON.parse(jsonObjectString);
-            console.log("======>cabal");
+            // console.log("======>cabal");
             await saveAnalystData(jsonObject, bot);
             //
           } catch (error) {

@@ -23,6 +23,11 @@ const allowUserCommand = {
   description: 'Allow User',
 };
 
-const commands = [startCommand, stopCommand, setMarketCapCommand, getMarketCapCommand, allowUserCommand];
+const manageUserCommand = {
+  command: 'manageuser',
+  description: 'Manage User',
+};
+
+const commands = [startCommand, stopCommand, setMarketCapCommand, getMarketCapCommand, manageUserCommand];
 
 module.exports = commands;
