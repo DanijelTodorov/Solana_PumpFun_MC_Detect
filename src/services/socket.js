@@ -197,7 +197,7 @@ const initSocket = (bot) => {
 
           try {
             const jsonObject = JSON.parse(jsonObjectString);
-            // console.log("======>cabal");
+            console.log("======>cabal");
             await saveAnalystData(jsonObject, bot);
             //
           } catch (error) {
